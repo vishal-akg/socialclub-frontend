@@ -459,10 +459,23 @@ function AvatarEditorDialog({ file, setFile }) {
 
 export async function getServerSideProps(context) {
   const { id } = context.query;
+  const { Authentication } = context.req.cookies;
+
+  if (!Authentication) {
+    return {
+      redirect: {
+        destination: "/auth",
+        permanent: false,
+      },
+    };
+  }
+
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users/${id}`, {
-    headers: context.req.headers,
+    headers: {
+      cookie: `Authentication=${Authentication}`,
+    },
   });
-  console.log(res.body);
+
   if (res.status === 200) {
     const user = await res.json();
     return { props: { user } };

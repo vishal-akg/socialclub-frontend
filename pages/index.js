@@ -43,7 +43,7 @@ export default function Index() {
           <Box
             sx={{
               position: "sticky",
-              top: (theme) => theme.mixins.toolbar.minHeight + 50,
+              top: (theme) => theme.mixins.toolbar.minHeight + 56,
             }}
           >
             <SideBar />
@@ -126,8 +126,20 @@ export default function Index() {
 }
 
 export async function getServerSideProps(context) {
+  const { Authentication } = context.req.cookies;
+
+  if (!Authentication) {
+    return {
+      redirect: {
+        destination: "/auth",
+        permanent: false,
+      },
+    };
+  }
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users/me`, {
-    headers: context.req.headers,
+    headers: {
+      cookie: `Authentication=${Authentication}`,
+    },
   });
 
   if (res.status === 200) {

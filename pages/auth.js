@@ -164,10 +164,18 @@ export default function Auth() {
 }
 
 export async function getServerSideProps(context) {
+  const { Authentication } = context.req.cookies;
+
+  if (!Authentication) {
+    return {
+      props: {},
+    };
+  }
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users/me`, {
-    headers: context.req.headers,
+    headers: {
+      cookie: `Authentication=${Authentication}`,
+    },
   });
-  console.log(res);
 
   if (res.status === 200) {
     return {
